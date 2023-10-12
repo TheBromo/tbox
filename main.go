@@ -10,10 +10,7 @@ import (
 	"github.com/gen2brain/beeep"
 )
 
-func processInput(args []string) error {
-	if len(args) < 1 {
-		return errors.New("you must pass a time")
-	}
+func processInput(arg string) error {
 
 	subcommand := os.Args[1]
 
@@ -40,7 +37,10 @@ func startTimer(timeMinutes int) {
 }
 
 func main() {
-	if err := processInput(os.Args[1:]); err != nil {
+	if os.Args[1] == "" {
+		processInput("15")
+	}
+	if err := processInput(os.Args[1]); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
