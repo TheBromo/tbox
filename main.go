@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
+
 	"github.com/gen2brain/beeep"
 )
 
 func processInput(args []string) error {
 	if len(args) < 1 {
-		return errors.New("You must pass a time")
+		return errors.New("you must pass a time")
 	}
 
 	subcommand := os.Args[1]
@@ -22,14 +24,16 @@ func processInput(args []string) error {
 	}
 
 	fmt.Printf("⏰ timebox created for %d minutes.\n", time)
-	go startTimer(time)
+	startTimer(time)
 
 	return nil
 }
 
 func startTimer(timeMinutes int) {
 
-	err := beeep.Notify("Title", "Message body", "assets/information.png")
+	time.Sleep(time.Duration(timeMinutes) * time.Minute)
+
+	err := beeep.Notify("Ring ring!!!!", "Your timer of "+strconv.Itoa(timeMinutes)+" min is over", "assets/icon.png")
 	if err != nil {
 		panic(err)
 	}
