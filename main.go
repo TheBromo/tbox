@@ -4,9 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"unicode"
 	"os/exec"
+	"unicode"
 )
+
+func main() {
+	if os.Args[1] == "" {
+		processInput("15")
+	}
+	if err := processInput(os.Args[1]); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
 
 func processInput(arg string) error {
 
@@ -18,14 +28,14 @@ func processInput(arg string) error {
 
 	for _, c := range subcommand {
 		if !unicode.IsDigit(c) {
-			return errors.New("argument is not a number")	
+			return errors.New("argument is not a number")
 		}
 	}
 
 	fmt.Printf("⏰ timebox created for %s minutes.\n", subcommand)
 
-	startTimerProcess(subcommand)
-	return nil
+	err := startTimerProcess(subcommand)
+	return err
 }
 
 func startTimerProcess(time string) error {
@@ -35,21 +45,11 @@ func startTimerProcess(time string) error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
 	if err != nil {
-		return errors.New( err.Error())
+		return errors.New(err.Error())
 	}
 	err = cmd.Process.Release()
 	if err != nil {
 		return errors.New("cmd.Process.Release failed: ")
 	}
 	return nil
-}
-
-func main() {
-	if os.Args[1] == "" {
-		processInput("15")
-	}
-	if err := processInput(os.Args[1]); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }

@@ -9,24 +9,29 @@ import (
 	"github.com/gen2brain/beeep"
 )
 
-func main(){	
-	time , err:= strconv.Atoi(os.Args[1])
+func main() {
+	time, err := strconv.Atoi(os.Args[1])
 
-	if err != nil{
+	note := os.Args[2]
+
+	if err != nil {
 		fmt.Println("invalid argument")
 		return
 	}
-	startTimer(time)
+	startTimer(time, note)
 }
 
-
-
-func startTimer(timeMinutes int) {
-
+func startTimer(timeMinutes int, note string) {
 	time.Sleep(time.Duration(timeMinutes) * time.Minute)
-
-	err := beeep.Notify("Ring ring!!!!", "Your timer of "+strconv.Itoa(timeMinutes)+" min is over", "assets/icon.png")
+	if note == "" {
+		err := beeep.Notify("Ring ring!!!!", "Your timer of "+strconv.Itoa(timeMinutes)+" minutes is over", "assets/icon.png")
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		err := beeep.Notify("Ring ring!!!", note + "has passed after "+ strconv.Itoa(timeMinutes) + " minutes", "assets/icon.png")
 	if err != nil {
-		panic(err)
+			panic(err)
+		}
 	}
 }
