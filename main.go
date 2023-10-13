@@ -4,36 +4,44 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
-	"time"
-
-	"github.com/gen2brain/beeep"
+	"unicode"
+	"os/exec"
 )
 
 func processInput(arg string) error {
 
 	subcommand := os.Args[1]
 
-	time, err := strconv.Atoi(subcommand)
-
-	if err != nil {
-		return err
+	if subcommand == "" {
+		subcommand = "15"
 	}
 
-	fmt.Printf("⏰ timebox created for %d minutes.\n", time)
-	startTimer(time)
+	for _, c := range subcommand {
+		if !unicode.IsDigit(c) {
+			return errors.New("argument is not a number")	
+		}
+	}
 
+	fmt.Printf("⏰ timebox created for %s minutes.\n", subcommand)
+
+	startTimerProcess(subcommand)
 	return nil
 }
 
-func startTimer(timeMinutes int) {
-
-	time.Sleep(time.Duration(timeMinutes) * time.Minute)
-
-	err := beeep.Notify("Ring ring!!!!", "Your timer of "+strconv.Itoa(timeMinutes)+" min is over", "assets/icon.png")
+func startTimerProcess(time string) error {
+	cmd := exec.Command("go", "run", "./go_timer", time)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Start()
 	if err != nil {
-		panic(err)
+		return errors.New( err.Error())
 	}
+	err = cmd.Process.Release()
+	if err != nil {
+		return errors.New("cmd.Process.Release failed: ")
+	}
+	return nil
 }
 
 func main() {
