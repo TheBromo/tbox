@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"unicode"
 )
 
 func main() {
-	if os.Args[1] == "" {
-		processInput("15")
-	}
 	if err := processInput(os.Args[1]); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -19,31 +17,36 @@ func main() {
 }
 
 func processInput(arg string) error {
+	time := "15"
+	comment := ""
 
-	subcommand := os.Args[1]
-
-	if subcommand == "" {
-		subcommand = "15"
+	if len(os.Args) > 1 {
+		time = os.Args[1]
+		if len(os.Args) > 2 {
+			comment = os.Args[2]
+		}
 	}
 
-	for _, c := range subcommand {
+	for _, c := range time {
 		if !unicode.IsDigit(c) {
 			return errors.New("argument is not a number")
 		}
 	}
 
-	fmt.Printf("⏰ timebox created for %s minutes.\n", subcommand)
+	fmt.Printf("[%s] ⏰ timebox created for %s minutes.\n", comment, time)
 
-	err := startTimerProcess(subcommand)
+	err := startTimerProcess(time, comment)
 	return err
 }
 
-func startTimerProcess(time string) error {
-	cmd := exec.Command("go", "run", "./go_timer", time)
+func startTimerProcess(time string, comment string) error {
+	e, err := os.Executable()
+
+	cmd := exec.Command(path.Dir(e)+"/go_timer/go_timer", time, comment)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
 		return errors.New(err.Error())
 	}
